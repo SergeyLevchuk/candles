@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use Imagine\Image\Box;
 use Yii;
 use app\models\LoginForm;
 use app\models\Candles;
@@ -10,6 +11,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
+use yii\imagine\Image;
 
 /**
  * SiteController implements the CRUD actions for Candles model.
@@ -103,9 +105,14 @@ class SiteController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $image = $this->findModel($id)
+            ->basic;
+        if ($image) {
+            @unlink('preView/' . $image);
+            @unlink('basicImage/' . $image);
+            $this->findModel($id)->delete();
+            return $this->redirect(['index']);
+        }
     }
 
     /**
@@ -155,6 +162,8 @@ class SiteController extends Controller
             $image = $model->uploadBasicImage();
             if ($image and $model->save()) {
                 $image->saveAs('basicImage/' . $model->basic);
+                $imagePreView = Image::getImagine();
+                $imagePreView->open(Yii::getAlias('basicImage/' . $model->basic))->thumbnail(new Box(300, 300))->save('preView/' . $model->basic);
                 $this->goHome();
             }
         }
