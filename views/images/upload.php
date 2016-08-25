@@ -2,7 +2,7 @@
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $model app\models\Candles */
+/* @var $model app\models\ */
 namespace  app\models;
 
 
@@ -14,12 +14,13 @@ $this->title = 'Загрузка';
 <div class="site-upload">
     <fieldset>
 
-        <legend><h1>Загрузка основной композиции</h1></legend>
+        <legend><h1>Загрузка остальных фотографий</h1></legend>
 
-        <p><h3>Добавьте файл для загрузки:</h3></p><br>
+        <p>
+        <h3>Добавьте файл(ы) для загрузки:</h3></p><br>
 
         <?php $form = ActiveForm::begin([
-            'id' => 'uploadBasicImage-form',
+            'id' => 'uploadImages-form',
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
                 'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
@@ -27,13 +28,11 @@ $this->title = 'Загрузка';
             ],
         ]); ?>
 
-        <?= $form->field($model, 'text')->textInput() ?>
-
-        <?= $form->field($model, 'imageFile')->fileInput() ?>
+        <?= $form->field($model, 'nameImage[]')->fileInput(['multiple' => true, 'accept' => 'image/*']) ?>
 
         <div class="form-group">
             <div class="col-lg-offset-1 col-lg-11">
-                <?= Html::submitButton('Загрузить', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                <?= Html::submitButton('Загрузить', ['class' => 'btn btn-primary', 'name' => 'login-button', 'id' => $_GET['id']]) ?>
             </div>
         </div>
 

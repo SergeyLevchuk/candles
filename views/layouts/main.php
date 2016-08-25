@@ -37,11 +37,11 @@ AppAsset::register($this);
 
     if (Yii::$app->user->isGuest) {
         $items = [
-            ['label' => 'Задать вопрос', 'url' => ['/site/contact']],
+            ['label' => 'Вопросы', 'url' => ['/site/contact']],
         ];
         $items[] = ['label' => 'Вход', 'url' => ['/site/login']];
     } else {
-        $items[]= ['label'=>'Ответить на вопрос(ы)', 'url'=>['/site/question']];
+        $items[]= ['label'=>'Ответить на вопрос', 'url'=>['/site/question']];
         $items [] = ['label' => 'Добавить запись', 'url' => ['/site/upload']];
 
         $items[] = [

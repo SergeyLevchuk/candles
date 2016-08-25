@@ -31,7 +31,8 @@ class Candles extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['imageFile'], 'file', 'extensions' => 'png, jpg, jpeg']
+            [['imageFile'], 'file', 'extensions' => 'png, jpg, jpeg'],
+            [['text'], 'required']
         ];
     }
 

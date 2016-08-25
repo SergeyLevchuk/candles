@@ -7,22 +7,22 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Login';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Вход на сайт';
 ?>
 <div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <fieldset>
+        <legend><h1>Вход</h1></legend
 
-    <p>Заполните поля для входа на сайт:</p>
+        <p>Заполните поля для входа на сайт:</p>
 
-    <?php $form = ActiveForm::begin([
-        'id' => 'login-form',
-        'options' => ['class' => 'form-horizontal'],
-        'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-1 control-label'],
-        ],
-    ]); ?>
+        <?php $form = ActiveForm::begin([
+            'id' => 'login-form',
+            'options' => ['class' => 'form-horizontal'],
+            'fieldConfig' => [
+                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+                'labelOptions' => ['class' => 'col-lg-1 control-label'],
+            ],
+        ]); ?>
 
         <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
 
@@ -38,5 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-    <?php ActiveForm::end(); ?>
+        <?php ActiveForm::end(); ?>
+    </fieldset>
 </div>

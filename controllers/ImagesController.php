@@ -2,22 +2,20 @@
 
 namespace app\controllers;
 
-use Imagine\Image\Box;
 use Yii;
-use app\models\LoginForm;
-use app\models\Candles;
-use app\models\CandlesSearch;
 use app\models\Images;
+use app\models\ImagesSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\helpers\Url;
-use yii\imagine\Image;
+use Imagine\Image\Box;
+use yii\web\UploadedFile;
+use yii\imagine\BaseImage;
 
 /**
- * SiteController implements the CRUD actions for Candles model.
+ * ImagesController implements the CRUD actions for Images model.
  */
-class SiteController extends Controller
+class ImagesController extends Controller
 {
     /**
      * @inheritdoc
@@ -35,22 +33,23 @@ class SiteController extends Controller
     }
 
     /**
-     * Lists all Candles models.
+     * Lists all Images models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($id)
     {
-        $searchModel = new CandlesSearch();
+        $searchModel = new ImagesSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'id' => $id
         ]);
     }
 
     /**
-     * Displays a single Candles model.
+     * Displays a single Images model.
      * @param integer $id
      * @return mixed
      */
@@ -62,16 +61,16 @@ class SiteController extends Controller
     }
 
     /**
-     * Creates a new Candles model.
+     * Creates a new Images model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Candles();
+        $model = new Images();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->idcandles]);
+            return $this->redirect(['view', 'id' => $model->idimages]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -80,7 +79,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Updates an existing Candles model.
+     * Updates an existing Images model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -90,7 +89,7 @@ class SiteController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->idcandles]);
+            return $this->redirect(['view', 'id' => $model->idimages]);
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -99,80 +98,53 @@ class SiteController extends Controller
     }
 
     /**
-     * Deletes an existing Candles model.
+     * Deletes an existing Images model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      */
     public function actionDelete($id)
     {
-        $image = $this->findModel($id)
-            ->basic;
-        $model = Images::find()->where(['candles_id' => $id])->all();
-        if ($image) {
-            @unlink('Images/preView/' . $image);
-            @unlink('Images/basicImage/' . $image);
-            foreach ($model as $unlink) {
-                @unlink('Images/Images/' . $unlink->nameImage);
-            }
-            $this->findModel($id)->delete();
-            return $this->redirect(['index']);
-        }
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Candles model based on its primary key value.
+     * Finds the Images model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Candles the loaded model
+     * @return Images the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Candles::findOne($id)) !== null) {
+        if (($model = Images::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
 
-    public function actionLogin()
+    public function actionUpload($id)
     {
-        if (!\Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->redirect(Url::home());
-        } else {
-            return $this->render('login', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    public function actionLogout()
-    {
-        Yii::$app->user->logout();
-
-        return $this->goHome();
-    }
-
-    public function actionUpload()
-    {
-        $model = new Candles();
-
-        if ($model->load(Yii::$app->request->post())) {
-            $image = $model->uploadBasicImage();
-            if ($image and $model->save()) {
-                $image->saveAs('Images/basicImage/' . $model->basic);
-                $imagePreView = Image::getImagine();
-                $imagePreView->open(Yii::getAlias('Images/basicImage/' . $model->basic))->thumbnail(new Box(300, 180))->save('Images/preView/' . $model->basic);
-                $this->goHome();
+        $model = new Images();
+        if (Yii::$app->request->post()) {
+            $image = UploadedFile::getInstances($model, 'nameImage');
+            foreach ($image as $item) {
+                $model = new Images();
+                $name = Yii::$app->security->generateRandomString() . '.' . $item->extension;
+                $item->name = $name;
+                $model->nameImage = $name;
+                $model->candles_id = $id;
+                if ($model->save()) {
+                    $item->saveAs('Images/Images/' . $name);
+                    return $this->redirect(['index', 'id' => $id]);
+                }
             }
         }
 
         return $this->render('upload', ['model' => $model]);
     }
+
 }
